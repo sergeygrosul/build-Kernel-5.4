@@ -977,12 +977,12 @@ prepare_host()
 
 	# check free space (basic)
 	local freespace=$(findmnt --target $SRC -n -o AVAIL -b 2>/dev/null) # in bytes
-	if [[ -n $freespace && $(( $freespace / 1073741824 )) -lt 10 ]]; then
-		display_alert "Low free space left" "$(( $freespace / 1073741824 )) GiB" "wrn"
+#	if [[ -n $freespace && $(( $freespace / 1073741824 )) -lt 10 ]]; then
+#		display_alert "Low free space left" "$(( $freespace / 1073741824 )) GiB" "wrn"
 		# pause here since dialog-based menu will hide this message otherwise
-		echo -e "Press \e[0;33m<Ctrl-C>\x1B[0m to abort compilation, \e[0;33m<Enter>\x1B[0m to ignore and continue"
-		read
-	fi
+#		echo -e "Press \e[0;33m<Ctrl-C>\x1B[0m to abort compilation, \e[0;33m<Enter>\x1B[0m to ignore and continue"
+#		read
+#	fi
 }
 
 
