@@ -2,4 +2,6 @@
 BOARD_NAME="pcDuino3 Nano"
 BOARDFAMILY="sun7i"
 BOOTCONFIG="Linksprite_pcDuino3_Nano_defconfig"
-KERNEL_TARGET="legacy,current,dev"
+MODULES="hci_uart gpio_sunxi rfcomm hidp sunxi-ir bonding spi_sun7i"
+MODULES_NEXT="bonding"
+KERNEL_TARGET="default,next,dev"

@@ -2,4 +2,6 @@
 BOARD_NAME="AW-SoM"
 BOARDFAMILY=sun7i
 BOOTCONFIG=Awsom_defconfig
-KERNEL_TARGET="current,dev"
+MODULES="hci_uart gpio_sunxi rfcomm hidp bonding spi_sun7i"
+MODULES_NEXT="bonding"
+KERNEL_TARGET="next"

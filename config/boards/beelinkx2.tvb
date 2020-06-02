@@ -2,4 +2,6 @@
 BOARD_NAME="Beelink X2"
 BOARDFAMILY="sun8i"
 BOOTCONFIG="beelink_x2_defconfig"
-KERNEL_TARGET="legacy,current,dev"
+MODULES="sndspdif sunxi_sndspdif sunxi_spdif sunxi_spdma sunxi-cir"
+MODULES_NEXT=""
+KERNEL_TARGET="default,next,dev"

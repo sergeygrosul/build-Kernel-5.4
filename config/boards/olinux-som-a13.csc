@@ -2,4 +2,6 @@
 BOARD_NAME="SoM A13"
 BOARDFAMILY="sun5i"
 BOOTCONFIG="A13-OLinuXino_defconfig"
-KERNEL_TARGET="current,dev"
+MODULES="gpio_sunxi spi_sunxi"
+MODULES_NEXT="bonding"
+KERNEL_TARGET="next,dev"

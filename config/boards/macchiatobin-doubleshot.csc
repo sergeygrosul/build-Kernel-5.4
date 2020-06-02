@@ -2,5 +2,7 @@
 BOARD_NAME="MACCHIATObin Double Shot"
 BOARDFAMILY="mvebu64"
 BOOTCONFIG="mvebu_mcbin-88f8040_defconfig"
+MODULES=""
+MODULES_NEXT=""
 BUILD_DESKTOP="no"
-KERNEL_TARGET="legacy,current"
+KERNEL_TARGET="default"

@@ -11,13 +11,9 @@
 
 create_desktop_package ()
 {
-	# join and cleanup package list
-	PACKAGE_LIST_DESKTOP+=" "${PACKAGE_LIST_DESKTOP_RECOMMENDS}
-	PACKAGE_LIST_DESKTOP=${PACKAGE_LIST_DESKTOP// /,};
-	PACKAGE_LIST_DESKTOP=${PACKAGE_LIST_DESKTOP//[[:space:]]/}
-
-	PACKAGE_LIST_PREDEPENDS=${PACKAGE_LIST_PREDEPENDS// /,};
-	PACKAGE_LIST_PREDEPENDS=${PACKAGE_LIST_PREDEPENDS//[[:space:]]/}
+	# cleanup package list
+	PACKAGE_LIST_DESKTOP=${PACKAGE_LIST_DESKTOP// /,}; PACKAGE_LIST_DESKTOP=${PACKAGE_LIST_DESKTOP//[[:space:]]/}
+	PACKAGE_LIST_DESKTOP_SUGGESTS=${PACKAGE_LIST_DESKTOP_SUGGESTS// /,}; PACKAGE_LIST_DESKTOP_SUGGESTS=${PACKAGE_LIST_DESKTOP_SUGGESTS//[[:space:]]/}
 
 	local destination=${SRC}/.tmp/${RELEASE}/${BOARD}/${CHOSEN_DESKTOP}_${REVISION}_all
 	rm -rf "${destination}"
@@ -33,8 +29,8 @@ create_desktop_package ()
 	Section: xorg
 	Priority: optional
 	Recommends: ${PACKAGE_LIST_DESKTOP//[:space:]+/,}
+	Suggests: ${PACKAGE_LIST_DESKTOP_SUGGESTS//[:space:]+/,}
 	Provides: ${CHOSEN_DESKTOP}
-	Pre-Depends: ${PACKAGE_LIST_PREDEPENDS//[:space:]+/,}
 	Description: Armbian desktop for ${DISTRIBUTION} ${RELEASE}
 	EOF
 
@@ -94,7 +90,7 @@ create_desktop_package ()
 
 
 	# using different icon pack. Workaround due to this bug https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=867779
-	if [[ ${RELEASE} == bionic || ${RELEASE} == stretch || ${RELEASE} == buster || ${RELEASE} == bullseye || ${RELEASE} == focal || ${RELEASE} == eoan ]]; then
+	if [[ ${RELEASE} == bionic || ${RELEASE} == stretch || ${RELEASE} == buster || ${RELEASE} == disco ]]; then
 	sed -i 's/<property name="IconThemeName" type="string" value=".*$/<property name="IconThemeName" type="string" value="Humanity-Dark"\/>/g' \
 	"${destination}"/etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml
 	fi
@@ -124,17 +120,9 @@ desktop_postinstall ()
 {
 	# disable display manager for first run
 	chroot "${SDCARD}" /bin/bash -c "systemctl --no-reload disable lightdm.service >/dev/null 2>&1"
-	chroot "${SDCARD}" /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt update" >> "${DEST}"/debug/install.log
 	if [[ ${FULL_DESKTOP} == yes ]]; then
-		chroot "${SDCARD}" /bin/bash -c "DEBIAN_FRONTEND=noninteractive  apt -yqq --no-install-recommends install $PACKAGE_LIST_DESKTOP_FULL" >> "${DEST}"/debug/install.log
-	fi
-
-	if [[ -n ${PACKAGE_LIST_DESKTOP_BOARD} ]]; then
-		chroot "${SDCARD}" /bin/bash -c "DEBIAN_FRONTEND=noninteractive  apt -yqq --no-install-recommends install $PACKAGE_LIST_DESKTOP_BOARD" >> "${DEST}"/debug/install.log
-	fi
-
-	if [[ -n ${PACKAGE_LIST_DESKTOP_FAMILY} ]]; then
-		chroot "${SDCARD}" /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt -yqq --no-install-recommends install $PACKAGE_LIST_DESKTOP_FAMILY" >> "${DEST}"/debug/install.log
+		chroot "${SDCARD}" /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt-get update" >> "${DEST}"/debug/install.log
+		chroot "${SDCARD}" /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt update; apt-get -yqq --no-install-recommends install $PACKAGE_LIST_DESKTOP_FULL" >> "${DEST}"/debug/install.log
 	fi
 
 	# Compile Turbo Frame buffer for sunxi

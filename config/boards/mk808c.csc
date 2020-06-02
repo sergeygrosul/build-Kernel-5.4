@@ -2,4 +2,6 @@
 BOARD_NAME="MK808C"
 BOARDFAMILY="sun7i"
 BOOTCONFIG="MK808C_defconfig"
-KERNEL_TARGET="legacy,current,dev"
+MODULES="hci_uart rfcomm hidp sunxi-ir"
+MODULES_NEXT=""
+KERNEL_TARGET="default,next"

@@ -26,7 +26,7 @@ compile_atf()
 {
 	if [[ $CLEAN_LEVEL == *make* ]]; then
 		display_alert "Cleaning" "$ATFSOURCEDIR" "info"
-		(cd $SRC/cache/sources/$ATFSOURCEDIR; make distclean > /dev/null 2>&1)
+		(cd $SRC/cache/sources/$ATFSOURCEDIR; make clean > /dev/null 2>&1)
 	fi
 
 	if [[ $USE_OVERLAYFS == yes ]]; then
@@ -54,7 +54,7 @@ compile_atf()
 	local target_patchdir=$(cut -d';' -f2 <<< $ATF_TARGET_MAP)
 	local target_files=$(cut -d';' -f3 <<< $ATF_TARGET_MAP)
 
-	advanced_patch "atf" "${ATFPATCHDIR}" "$BOARD" "$target_patchdir" "$BRANCH" "${LINUXFAMILY}-${BOARD}-${BRANCH}"
+	advanced_patch "atf" "atf-${LINUXFAMILY}" "$BOARD" "$target_patchdir" "$BRANCH" "${LINUXFAMILY}-${BOARD}-${BRANCH}"
 
 	# create patch for manual source changes
 	[[ $CREATE_PATCHES == yes ]] && userpatch_create "atf"
@@ -273,6 +273,15 @@ compile_kernel()
 	fi
 	cd "$kerneldir"
 
+	# this is a patch that Ubuntu Trusty compiler works
+	# TODO: Check if still required
+	if [[ $(patch --dry-run -t -p1 < $SRC/patch/kernel/compiler.patch | grep Reversed) != "" ]]; then
+		display_alert "Patching kernel for compiler support"
+		patch --batch --silent -t -p1 < $SRC/patch/kernel/compiler.patch >> $DEST/debug/output.log 2>&1
+	fi
+
+	advanced_patch "kernel" "$KERNELPATCHDIR" "$BOARD" "" "$BRANCH" "$LINUXFAMILY-$BRANCH"
+
 	if ! grep -qoE '^-rc[[:digit:]]+' <(grep "^EXTRAVERSION" Makefile | head -1 | awk '{print $(NF)}'); then
 		sed -i 's/EXTRAVERSION = .*/EXTRAVERSION = /' Makefile
 	fi
@@ -283,14 +292,6 @@ compile_kernel()
 
 	# build 3rd party drivers
 	compilation_prepare
-
-	advanced_patch "kernel" "$KERNELPATCHDIR" "$BOARD" "" "$BRANCH" "$LINUXFAMILY-$BRANCH"
-
-        # create patch for manual source changes in debug mode
-        [[ $CREATE_PATCHES == yes ]] && userpatch_create "kernel"
-
-        # re-read kernel version after patching
-        local version=$(grab_version "$kerneldir")
 
 	# create linux-source package - with already patched sources
 	local sources_pkg_dir=$SRC/.tmp/${CHOSEN_KSRC}_${REVISION}_all
@@ -304,6 +305,9 @@ compile_kernel()
 			| pixz -4 > $sources_pkg_dir/usr/src/linux-source-${version}-${LINUXFAMILY}.tar.xz
 		cp COPYING $sources_pkg_dir/usr/share/doc/linux-source-${version}-${LINUXFAMILY}/LICENSE
 	fi
+
+	# create patch for manual source changes in debug mode
+	[[ $CREATE_PATCHES == yes ]] && userpatch_create "kernel"
 
 	display_alert "Compiling $BRANCH kernel" "$version" "info"
 
@@ -392,7 +396,6 @@ compile_kernel()
 	eval CCACHE_BASEDIR="$(pwd)" env PATH=$toolchain:$PATH \
 		'make -j1 $kernel_packing \
 		KDEB_PKGVERSION=$REVISION \
-		BRANCH=$BRANCH \
 		LOCALVERSION="-${LINUXFAMILY}" \
 		KBUILD_DEBARCH=$ARCH \
 		ARCH=$ARCHITECTURE \
@@ -499,7 +502,7 @@ compile_armbian-config()
 	Architecture: all
 	Maintainer: $MAINTAINER <$MAINTAINERMAIL>
 	Replaces: armbian-bsp
-	Depends: bash, iperf3, psmisc, curl, bc, expect, dialog, iptables, resolvconf, pv, \
+	Depends: bash, iperf3, psmisc, curl, bc, expect, dialog, iptables, resolvconf, \
 	debconf-utils, unzip, build-essential, html2text, apt-transport-https, html2text, dirmngr, software-properties-common
 	Recommends: armbian-bsp
 	Suggests: libpam-google-authenticator, qrencode, network-manager, sunxi-tools
@@ -648,7 +651,6 @@ advanced_patch()
 		"$SRC/patch/$dest/$family/branch_${branch}:[\e[32ml\e[0m][\e[33mb\e[0m]"
 		"$SRC/patch/$dest/$family:[\e[32ml\e[0m][\e[32mc\e[0m]"
 		)
-	local links=()
 
 	# required for "for" command
 	shopt -s nullglob dotglob
@@ -657,14 +659,7 @@ advanced_patch()
 		for patch in ${dir%%:*}/*.patch; do
 			names+=($(basename $patch))
 		done
-		# add linked patch directories
-		if [[ -d ${dir%%:*} ]]; then
-			local findlinks=$(find ${dir%%:*} -maxdepth 1 -type l -print0 2>&1 | xargs -0)
-			[[ -n $findlinks ]] && readarray -d '' links < <(find $findlinks -maxdepth 1 -type f -follow -print -iname "*.patch" -print | grep "\.patch$" | sed "s|${dir%%:*}/||g" 2>&1)
-		fi
 	done
-	# merge static and linked
-	names=("${names[@]}" "${links[@]}")
 	# remove duplicates
 	local names_s=($(echo "${names[@]}" | tr ' ' '\n' | LC_ALL=C sort -u | tr '\n' ' '))
 	# apply patches

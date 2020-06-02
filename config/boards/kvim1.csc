@@ -1,6 +1,8 @@
 # S905x quad core 2Gb RAM SoC eMMC
 BOARD_NAME="Khadas VIM1"
-BOARDFAMILY="meson-gxl"
+BOARDFAMILY="meson64"
 BOOTCONFIG="khadas-vim_defconfig"
-KERNEL_TARGET="current,dev"
+MODULES=""
+MODULES_NEXT=""
+KERNEL_TARGET="dev"
 FULL_DESKTOP="yes"

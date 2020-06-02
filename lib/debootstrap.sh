@@ -75,6 +75,8 @@ debootstrap_ng()
 		source $SRC/lib/fel-load.sh
 	else
 		prepare_partitions
+		# update initramfs to reflect any configuration changes since kernel installation
+		update_initramfs
 		create_image
 	fi
 
@@ -99,34 +101,17 @@ debootstrap_ng()
 #
 create_rootfs_cache()
 {
-	if [[ "$ROOT_FS_CREATE_ONLY" == "force" ]]; then
-		local cycles=1
-		else
-		local cycles=2
+	local packages_hash=$(get_package_list_hash)
+	local cache_type=$(if [[ ${BUILD_DESKTOP} == yes  ]]; then echo "desktop"; elif [[ ${BUILD_MINIMAL} == yes  ]]; then echo "minimal"; else echo "cli";fi)
+	local cache_name=${RELEASE}-${cache_type}-${ARCH}.$packages_hash.tar.lz4
+	local cache_fname=${SRC}/cache/rootfs/${cache_name}
+	local display_name=${RELEASE}-${cache_type}-${ARCH}.${packages_hash:0:3}...${packages_hash:29}.tar.lz4
+
+	display_alert "Checking for local cache" "$display_name" "info"
+	if [[ ! -f $cache_fname && "$ROOT_FS_CREATE_ONLY" != "force" ]]; then
+		display_alert "searching on servers"
+		download_and_verify "_rootfs" "$cache_name"
 	fi
-	# seek last cache, proceed to previous otherwise build it
-	for ((n=0;n<${cycles};n++)); do
-
-		local packages_hash=$(get_package_list_hash "$(($ROOTFSCACHE_VERSION - $n))")
-		local cache_type=$(if [[ ${BUILD_DESKTOP} == yes  ]]; then echo "desktop"; elif [[ ${BUILD_MINIMAL} == yes  ]]; then echo "minimal"; else echo "cli";fi)
-		local cache_name=${RELEASE}-${cache_type}-${ARCH}.$packages_hash.tar.lz4
-		local cache_fname=${SRC}/cache/rootfs/${cache_name}
-		local display_name=${RELEASE}-${cache_type}-${ARCH}.${packages_hash:0:3}...${packages_hash:29}.tar.lz4
-
-		display_alert "Checking for local cache" "$display_name" "info"
-
-		if [[ ! -f $cache_fname && "$ROOT_FS_CREATE_ONLY" != "force" ]]; then
-			display_alert "searching on servers"
-			download_and_verify "_rootfs" "$cache_name"
-		fi
-
-		if [[ -f $cache_fname ]]; then
-			break
-		else
-			display_alert "not found: try to use previous cache"
-		fi
-
-	done
 
 	if [[ -f $cache_fname && "$ROOT_FS_CREATE_ONLY" != "force" ]]; then
 		local date_diff=$(( ($(date +%s) - $(stat -c %Y $cache_fname)) / 86400 ))
@@ -200,7 +185,7 @@ create_rootfs_cache()
 			eval 'LC_ALL=C LANG=C chroot $SDCARD /bin/bash -c "setupcon --save"'
 		fi
 
-		# stage: create apt-get sources list
+		# stage: create apt sources list
 		create_sources_list "$RELEASE" "$SDCARD/"
 
 		# add armhf arhitecture to arm64
@@ -211,7 +196,7 @@ create_rootfs_cache()
 
 		# stage: update packages list
 		display_alert "Updating package list" "$RELEASE" "info"
-		eval 'LC_ALL=C LANG=C chroot $SDCARD /bin/bash -c "apt -q -y $apt_extra update"' \
+		eval 'LC_ALL=C LANG=C chroot $SDCARD /bin/bash -c "apt-get -q -y $apt_extra update"' \
 			${PROGRESS_LOG_TO_FILE:+' | tee -a $DEST/debug/debootstrap.log'} \
 			${OUTPUT_DIALOG:+' | dialog --backtitle "$backtitle" --progressbox "Updating package lists..." $TTY_Y $TTY_X'} \
 			${OUTPUT_VERYSILENT:+' >/dev/null 2>/dev/null'}
@@ -220,7 +205,7 @@ create_rootfs_cache()
 
 		# stage: upgrade base packages from xxx-updates and xxx-backports repository branches
 		display_alert "Upgrading base packages" "Armbian" "info"
-		eval 'LC_ALL=C LANG=C chroot $SDCARD /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt -y -q \
+		eval 'LC_ALL=C LANG=C chroot $SDCARD /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt-get -y -q \
 			$apt_extra $apt_extra_progress upgrade"' \
 			${PROGRESS_LOG_TO_FILE:+' | tee -a $DEST/debug/debootstrap.log'} \
 			${OUTPUT_DIALOG:+' | dialog --backtitle "$backtitle" --progressbox "Upgrading base packages..." $TTY_Y $TTY_X'} \
@@ -239,7 +224,7 @@ create_rootfs_cache()
 		[[ ${PIPESTATUS[0]} -ne 0 ]] && exit_with_error "Installation of Armbian packages failed"
 
 		# stage: remove downloaded packages
-		chroot $SDCARD /bin/bash -c "apt clean"
+		chroot $SDCARD /bin/bash -c "apt-get clean"
 
 		# DEBUG: print free space
 		echo -e "\nFree space:"
@@ -316,7 +301,7 @@ prepare_partitions()
 	# parttype[nfs] is empty
 
 	# metadata_csum and 64bit may need to be disabled explicitly when migrating to newer supported host OS releases
-	if [[ $(lsb_release -sc) =~ bionic|buster|bullseye|cosmic|eoan|focal ]]; then
+	if [[ $(lsb_release -sc) =~ bionic|buster|cosmic|disco ]]; then
 		mkopts[ext4]='-q -m 2 -O ^64bit,^metadata_csum'
 	elif [[ $(lsb_release -sc) == xenial ]]; then
 		mkopts[ext4]='-q -m 2'
@@ -540,23 +525,18 @@ prepare_partitions()
 # for cryptroot-unlock to work:
 # https://serverfault.com/questions/907254/cryproot-unlock-with-dropbear-timeout-while-waiting-for-askpass
 #
-# since Debian buster, it has to be called within create_image() on the $MOUNT
-# path instead of $SDCARD (which can be a tmpfs and breaks cryptsetup-initramfs).
-# see: https://github.com/armbian/build/issues/1584
-#
-update_initramfs()
-{
-	local chroot_target=$1
+update_initramfs() {
+
 	update_initramfs_cmd="update-initramfs -uv -k ${VER}-${LINUXFAMILY}"
 	display_alert "Updating initramfs..." "$update_initramfs_cmd" ""
-	cp /usr/bin/$QEMU_BINARY $chroot_target/usr/bin/
-	mount_chroot "$chroot_target/"
+	cp /usr/bin/$QEMU_BINARY $SDCARD/usr/bin/
+	mount_chroot "$SDCARD/"
 
-	chroot $chroot_target /bin/bash -c "$update_initramfs_cmd" >> $DEST/debug/install.log 2>&1
+	chroot $SDCARD /bin/bash -c "$update_initramfs_cmd" >> $DEST/debug/install.log 2>&1
 	display_alert "Updated initramfs." "for details see: $DEST/debug/install.log" "ext"
 
-	umount_chroot "$chroot_target/"
-	rm $chroot_target/usr/bin/$QEMU_BINARY
+	umount_chroot "$SDCARD/"
+	rm $SDCARD/usr/bin/$QEMU_BINARY
 
 } #############################################################################
 
@@ -567,7 +547,7 @@ update_initramfs()
 create_image()
 {
 	# stage: create file name
-	local version="Armbian_${REVISION}_${BOARD^}_${RELEASE}_${BRANCH}_${VER/-$LINUXFAMILY/}"
+	local version="Armbian_${REVISION}_${BOARD^}_${DISTRIBUTION}_${RELEASE}_${BRANCH}_${VER/-$LINUXFAMILY/}"
 	[[ $BUILD_DESKTOP == yes ]] && version=${version}_desktop
 	[[ $BUILD_MINIMAL == yes ]] && version=${version}_minimal
 	[[ $ROOTFS_TYPE == nfs ]] && version=${version}_nfsboot
@@ -591,9 +571,6 @@ create_image()
 		# ext4
 		rsync -aHWXh --info=progress2,stats1 $SDCARD/boot $MOUNT
 	fi
-
-	# stage: create final initramfs
-	update_initramfs $MOUNT
 
 	# DEBUG: print free space
 	display_alert "Free space:" "SD card" "info"
@@ -626,13 +603,11 @@ create_image()
 	mv ${SDCARD}.raw $DESTIMG/${version}.img
 
 	if [[ $BUILD_ALL != yes ]]; then
-		if [[ $COMPRESS_OUTPUTIMAGE == "" || $COMPRESS_OUTPUTIMAGE == no ]]; then
-			COMPRESS_OUTPUTIMAGE="sha,gpg,img"
-		elif [[ $COMPRESS_OUTPUTIMAGE == yes ]]; then
+		if [[ $COMPRESS_OUTPUTIMAGE == yes ]]; then
 			COMPRESS_OUTPUTIMAGE="sha,gpg,7z"
 		fi
 
-		if [[ $COMPRESS_OUTPUTIMAGE == *sha* || -n $CARD_DEVICE ]]; then
+		if [[ $COMPRESS_OUTPUTIMAGE == *sha* ]]; then
 			cd $DESTIMG
 			display_alert "SHA256 calculating" "${version}.img" "info"
 			sha256sum -b ${version}.img > ${version}.img.sha
@@ -652,34 +627,25 @@ create_image()
 			cd ..
 		fi
 
-		# compress image
 		if [[ $COMPRESS_OUTPUTIMAGE == *7z* ]]; then
-			# copy unlock keys
-			[[ -f $DEST/images/$CRYPTROOT_SSH_UNLOCK_KEY_NAME ]] && \
-			cp $DEST/images/$CRYPTROOT_SSH_UNLOCK_KEY_NAME $DESTIMG/
+			[[ -f $DEST/images/$CRYPTROOT_SSH_UNLOCK_KEY_NAME ]] && cp $DEST/images/$CRYPTROOT_SSH_UNLOCK_KEY_NAME $DESTIMG/
+			# compress image
 			cd $DESTIMG
 			display_alert "Compressing" "$DEST/images/${version}.7z" "info"
-			7za a -t7z -bd -m0=lzma2 -mx=3 -mfb=64 -md=32m -ms=on \
-			$DEST/images/${version}.7z ${version}.key ${version}.img* >/dev/null 2>&1
-			find $DEST/images/ -type \
-			f \( -name "${version}.img" -o -name "${version}.img.asc" -o -name "${version}.img.sha" \) -print0 \
-			| xargs -0 rm >/dev/null 2>&1
+			7za a -t7z -bd -m0=lzma2 -mx=3 -mfb=64 -md=32m -ms=on $DEST/images/${version}.7z ${version}.key ${version}.img* ${version}.img.txt >/dev/null 2>&1
 			cd ..
 		fi
+
 		if [[ $COMPRESS_OUTPUTIMAGE == *gz* ]]; then
 			display_alert "Compressing" "$DEST/images/${version}.img.gz" "info"
-			pigz -3 < $DESTIMG/${version}.img > $DEST/images/${version}.img.gz
+			pigz < $DESTIMG/${version}.img > $DEST/images/${version}.img.gz
 		fi
-		if [[ $COMPRESS_OUTPUTIMAGE == *xz* ]]; then
-			display_alert "Compressing" "$DEST/images/${version}.img.xz" "info"
-			pixz -3 < $DESTIMG/${version}.img > $DEST/images/${version}.img.xz
-		fi
-		if [[ $COMPRESS_OUTPUTIMAGE == *img* ]]; then
-			[[ -f $DESTIMG/${version}.img.txt ]] && mv $DESTIMG/${version}.img.txt $DEST/images/${version}.img.txt
-			mv $DESTIMG/${version}.img $DEST/images/${version}.img || exit 1
-		fi
+
+		mv $DESTIMG/${version}.img.txt $DEST/images/${version}.img.txt || exit 1
+		mv $DESTIMG/${version}.img $DEST/images/${version}.img || exit 1
 		rm -rf $DESTIMG
 	fi
+
 	display_alert "Done building" "$DEST/images/${version}.img" "info"
 
 	# call custom post build hook
