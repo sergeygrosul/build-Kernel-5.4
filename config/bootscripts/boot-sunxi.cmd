@@ -37,8 +37,22 @@ fi
 
 if test "${logo}" = "disabled"; then setenv logo "logo.nologo"; fi
 
+
 if test "${console}" = "display" || test "${console}" = "both"; then setenv consoleargs "console=ttyS0,115200 console=tty1"; fi
 if test "${console}" = "serial"; then setenv consoleargs "console=ttyS0,115200"; fi
+# check INP1(PH17=241) pin, if HIGH then enable alternative UART
+gpio input 241
+if test $? = 1 || test "${console}" = "serial2"; then 
+	echo "Selected alternative serial console UART7"
+	# Enable TX mode for RS485 receiver
+	gpio set 275 1
+	# Set ADG715 TTL mode
+	i2c dev 2
+	i2c mw 0x4b 0 5
+	# Set Kernel UART
+	setenv consoleargs "console=ttyS2,115200"
+fi
+
 
 setenv bootargs "root=${rootdev} rootwait rootfstype=${rootfstype} ${consoleargs} hdmi.audio=EDID:0 disp.screen0_output_mode=${disp_mode} consoleblank=0 loglevel=${verbosity} ubootpart=${partuuid} ubootsource=${devtype} usb-storage.quirks=${usbstoragequirks} ${extraargs} ${extraboardargs}"
 

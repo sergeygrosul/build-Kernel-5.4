@@ -316,6 +316,43 @@ compilation_prepare()
 	fi
 
 
+	# Wireless drivers for Realtek RTL8188FU chipset
+
+	if linux-version compare $version ge 3.14 && [ "$EXTRAWIFI" == yes ]; then
+
+		# attach to specifics tag or branch
+		local rtl8188fuver="branch:master"
+
+		display_alert "Adding" "Wireless drivers for Realtek RTL8188FU chipset ${rtl8811fuver}" "info"
+
+		fetch_from_repo "https://github.com/kelebek333/rtl8188fu" "rtl8188fu" "${rtl8188fuver}" "yes"
+		cd ${SRC}/cache/sources/${LINUXSOURCEDIR}
+		rm -rf ${SRC}/cache/sources/${LINUXSOURCEDIR}/drivers/net/wireless/rtl8188fu
+		mkdir -p ${SRC}/cache/sources/${LINUXSOURCEDIR}/drivers/net/wireless/rtl8188fu/
+		cp -R ${SRC}/cache/sources/rtl8188fu/${rtl8188fuver#*:}/{core,hal,include,os_dep,platform} \
+		${SRC}/cache/sources/${LINUXSOURCEDIR}/drivers/net/wireless/rtl8188fu
+
+		# Makefile
+		cp ${SRC}/cache/sources/rtl8188fu/${rtl8188fuver#*:}/Makefile \
+		${SRC}/cache/sources/${LINUXSOURCEDIR}/drivers/net/wireless/rtl8188fu/Makefile
+		cp ${SRC}/cache/sources/rtl8188fu/${rtl8188fuver#*:}/Kconfig \
+		${SRC}/cache/sources/${LINUXSOURCEDIR}/drivers/net/wireless/rtl8188fu/Kconfig
+
+		# Disable debug
+		sed -i "s/^CONFIG_RTW_DEBUG.*/CONFIG_RTW_DEBUG = n/" \
+		${SRC}/cache/sources/${LINUXSOURCEDIR}/drivers/net/wireless/rtl8188fu/Makefile
+
+		# Add to section Makefile
+		echo "obj-\$(CONFIG_RTL8188FU) += rtl8188fu/" >> $SRC/cache/sources/${LINUXSOURCEDIR}/drivers/net/wireless/Makefile
+		sed -i '/source "drivers\/net\/wireless\/ti\/Kconfig"/a source "drivers\/net\/wireless\/rtl8188fu\/Kconfig"' \
+		$SRC/cache/sources/${LINUXSOURCEDIR}/drivers/net/wireless/Kconfig
+
+		# kernel 5.6 ->
+		process_patch_file "${SRC}/patch/misc/wireless-rtl8188fu.patch" "applying"
+
+	fi
+
+
 
 
 	# Wireless drivers for Realtek 8188EU 8188EUS and 8188ETV chipsets
