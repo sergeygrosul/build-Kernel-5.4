@@ -926,24 +926,28 @@ prepare_host()
 	# download external Linaro compiler and missing special dependencies since they are needed for certain sources
 
 	local toolchains=(
-		"https://dl.armbian.com/_toolchains/gcc-linaro-aarch64-none-elf-4.8-2013.11_linux.tar.xz"
-		"https://dl.armbian.com/_toolchains/gcc-linaro-arm-none-eabi-4.8-2014.04_linux.tar.xz"
-		"https://dl.armbian.com/_toolchains/gcc-linaro-arm-linux-gnueabihf-4.8-2014.04_linux.tar.xz"
-		"https://dl.armbian.com/_toolchains/gcc-linaro-4.9.4-2017.01-x86_64_aarch64-linux-gnu.tar.xz"
-		"https://dl.armbian.com/_toolchains/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabi.tar.xz"
-		"https://dl.armbian.com/_toolchains/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf.tar.xz"
-		"https://dl.armbian.com/_toolchains/gcc-linaro-5.5.0-2017.10-x86_64_aarch64-linux-gnu.tar.xz"
-		"https://dl.armbian.com/_toolchains/gcc-linaro-5.5.0-2017.10-x86_64_arm-linux-gnueabi.tar.xz"
-		"https://dl.armbian.com/_toolchains/gcc-linaro-5.5.0-2017.10-x86_64_arm-linux-gnueabihf.tar.xz"
-		"https://dl.armbian.com/_toolchains/gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf.tar.xz"
-		"https://dl.armbian.com/_toolchains/gcc-linaro-6.4.1-2017.11-x86_64_aarch64-linux-gnu.tar.xz"
-		"https://dl.armbian.com/_toolchains/gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf.tar.xz"
-		"https://dl.armbian.com/_toolchains/gcc-linaro-7.4.1-2019.02-x86_64_arm-eabi.tar.xz"
-		"https://dl.armbian.com/_toolchains/gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabi.tar.xz"
-		"https://dl.armbian.com/_toolchains/gcc-linaro-7.4.1-2019.02-x86_64_aarch64-linux-gnu.tar.xz"
-		"https://dl.armbian.com/_toolchains/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf.tar.xz"
-		"https://dl.armbian.com/_toolchains/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz"
+		"http://tarkus-notes.com/armbian/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf.tar.xz"
 		)
+
+#	local toolchains=(
+#		"https://dl.armbian.com/_toolchains/gcc-linaro-aarch64-none-elf-4.8-2013.11_linux.tar.xz"
+#		"https://dl.armbian.com/_toolchains/gcc-linaro-arm-none-eabi-4.8-2014.04_linux.tar.xz"
+#		"https://dl.armbian.com/_toolchains/gcc-linaro-arm-linux-gnueabihf-4.8-2014.04_linux.tar.xz"
+#		"https://dl.armbian.com/_toolchains/gcc-linaro-4.9.4-2017.01-x86_64_aarch64-linux-gnu.tar.xz"
+#		"https://dl.armbian.com/_toolchains/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabi.tar.xz"
+#		"https://dl.armbian.com/_toolchains/gcc-linaro-4.9.4-2017.01-x86_64_arm-linux-gnueabihf.tar.xz"
+#		"https://dl.armbian.com/_toolchains/gcc-linaro-5.5.0-2017.10-x86_64_aarch64-linux-gnu.tar.xz"
+#		"https://dl.armbian.com/_toolchains/gcc-linaro-5.5.0-2017.10-x86_64_arm-linux-gnueabi.tar.xz"
+#		"https://dl.armbian.com/_toolchains/gcc-linaro-5.5.0-2017.10-x86_64_arm-linux-gnueabihf.tar.xz"
+#		"https://dl.armbian.com/_toolchains/gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf.tar.xz"
+#		"https://dl.armbian.com/_toolchains/gcc-linaro-6.4.1-2017.11-x86_64_aarch64-linux-gnu.tar.xz"
+#		"https://dl.armbian.com/_toolchains/gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabihf.tar.xz"
+#		"https://dl.armbian.com/_toolchains/gcc-linaro-7.4.1-2019.02-x86_64_arm-eabi.tar.xz"
+#		"https://dl.armbian.com/_toolchains/gcc-linaro-7.4.1-2019.02-x86_64_arm-linux-gnueabi.tar.xz"
+#		"https://dl.armbian.com/_toolchains/gcc-linaro-7.4.1-2019.02-x86_64_aarch64-linux-gnu.tar.xz"
+#		"https://dl.armbian.com/_toolchains/gcc-arm-8.3-2019.03-x86_64-arm-linux-gnueabihf.tar.xz"
+#		"https://dl.armbian.com/_toolchains/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz"
+#		)
 
 	for toolchain in ${toolchains[@]}; do
 		download_and_verify "_toolchains" "${toolchain##*/}"
@@ -987,20 +991,23 @@ prepare_host()
 
 
 
-
 function webseed ()
 {
 # list of mirrors that host our files
 unset text
 WEBSEED=(
-	"https://dl.armbian.com/"
-	"https://imola.armbian.com/"
-	"https://mirrors.netix.net/armbian/dl/"
-	"https://mirrors.dotsrc.org/armbian-dl/"
+                "http://tarkus-notes.com/armbian"
+#	"https://dl.armbian.com/"
+#	#"https://imola.armbian.com/dl/"
+#	"https://mirrors.netix.net/armbian/dl/"
+#	"https://mirrors.dotsrc.org/armbian-dl/"
+#	"https://us.mirrors.fossho.st/armbian/dl/"
+#	"https://uk.mirrors.fossho.st/armbian/dl/"
+#	"https://armbian.systemonachip.net/dl/"
 	)
 	if [[ -z $DOWNLOAD_MIRROR ]]; then
 		WEBSEED=(
-                "https://dl.armbian.com/"
+                "http://tarkus-notes.com/armbian"
                 )
 	fi
 	# aria2 simply split chunks based on sources count not depending on download speed
@@ -1012,12 +1019,12 @@ WEBSEED=(
 	fi
 	for toolchain in ${WEBSEED[@]}; do
 		# use only live
-		if [[ `wget -S --spider $toolchain$1 2>&1 >/dev/null | grep 'HTTP/1.1 200 OK'` ]]; then
-			text=$text" "$toolchain$1
+		if [[ $(wget -S --spider "${toolchain}${1}" 2>&1 >/dev/null | grep 'HTTP/1.1 200 OK') ]]; then
+			text="${text} ${toolchain}${1}"
 		fi
 	done
 	text="${text:1}"
-	echo $text
+	echo "${text}"
 }
 
 
@@ -1034,26 +1041,26 @@ download_and_verify()
         if [[ $DOWNLOAD_MIRROR == china ]]; then
 		local server="https://mirrors.tuna.tsinghua.edu.cn/armbian-releases/"
 			else
-		local server="https://dl.armbian.com/"
+		local server="http://tarkus-notes.com/"
         fi
 
 	if [[ -f ${localdir}/${dirname}/.download-complete ]]; then
 		return
 	fi
 
-	cd ${localdir}
+	cd "${localdir}" || exit
 
 	# use local control file
-	if [[ -f $SRC/config/torrents/${filename}.asc ]]; then
-		local torrent=$SRC/config/torrents/${filename}.torrent
-		ln -s $SRC/config/torrents/${filename}.asc ${localdir}/${filename}.asc
-	elif [[ ! `wget -S --spider ${server}${remotedir}/${filename}.asc 2>&1 >/dev/null | grep 'HTTP/1.1 200 OK'` ]]; then
+	if [[ -f "${SRC}"/config/torrents/${filename}.asc ]]; then
+		local torrent="${SRC}"/config/torrents/${filename}.torrent
+		ln -s "${SRC}/config/torrents/${filename}.asc" "${localdir}/${filename}.asc"
+	elif [[ ! $(wget -S --spider "${server}${remotedir}/${filename}.asc" 2>&1 >/dev/null | grep 'HTTP/1.1 200 OK') ]]; then
 		return
 	else
 		# download control file
-		local torrent=${server}torrent/${filename}.torrent
+		local torrent=${server}$remotedir/${filename}.torrent
 		aria2c --download-result=hide --disable-ipv6=true --summary-interval=0 --console-log-level=error --auto-file-renaming=false \
-		--continue=false --allow-overwrite=true --dir=${localdir} $(webseed "$remotedir/${filename}.asc") -o "${filename}.asc"
+		--continue=false --allow-overwrite=true --dir="${localdir}" "$(webseed "$remotedir/${filename}.asc")" -o "${filename}.asc"
 		[[ $? -ne 0 ]] && display_alert "Failed to download control file" "" "wrn"
 	fi
 
@@ -1064,75 +1071,77 @@ download_and_verify()
 		local ariatorrent="--summary-interval=0 --auto-save-interval=0 --seed-time=0 --bt-stop-timeout=15 --console-log-level=error \
 		--allow-overwrite=true --download-result=hide --rpc-save-upload-metadata=false --auto-file-renaming=false \
 		--file-allocation=trunc --continue=true ${torrent} \
-		--dht-file-path=$SRC/cache/.aria2/dht.dat --disable-ipv6=true --stderr --follow-torrent=mem --dir=${localdir}"
+		--dht-file-path=${SRC}/cache/.aria2/dht.dat --disable-ipv6=true --stderr --follow-torrent=mem --dir=$localdir"
 
 		# exception. It throws error if dht.dat file does not exists. Error suppress needed only at first download.
-		if [[ -f $SRC/cache/.aria2/dht.dat ]]; then
+		if [[ -f "${SRC}"/cache/.aria2/dht.dat ]]; then
+			# shellcheck disable=SC2086
 			aria2c ${ariatorrent}
 		else
-			aria2c ${ariatorrent} &> $DEST/debug/torrent.log
+			# shellcheck disable=SC2035
+			aria2c ${ariatorrent} &> "${DEST}"/debug/torrent.log
 		fi
 		# mark complete
-		[[ $? -eq 0 ]] && touch ${localdir}/${filename}.complete
+		[[ $? -eq 0 ]] && touch "${localdir}/${filename}.complete"
 
 	fi
 
-
 	# direct download if torrent fails
-	if [[ ! -f ${localdir}/${filename}.complete ]]; then
-		if [[ `wget -S --spider ${server}${remotedir}/${filename} 2>&1 >/dev/null \
-			| grep 'HTTP/1.1 200 OK'` ]]; then
+	if [[ true || ! -f "${localdir}/${filename}.complete" ]]; then
+#		if [[ $(wget -S --spider "${server}${remotedir}/${filename}"  \
+		if [[ $(wget -S --spider "${server}${remotedir}/${filename}" 2>&1 >/dev/null \
+			| grep 'HTTP/1.1 200 OK') ]]; then
 			display_alert "downloading using http(s) network" "$filename"
 			aria2c --download-result=hide --rpc-save-upload-metadata=false --console-log-level=error \
-			--dht-file-path=$SRC/cache/.aria2/dht.dat --disable-ipv6=true --summary-interval=0 --auto-file-renaming=false --dir=${localdir} $(webseed "$remotedir/$filename") -o ${filename}
+			--dht-file-path="${SRC}"/cache/.aria2/dht.dat --disable-ipv6=true --summary-interval=0 --auto-file-renaming=false --dir="${localdir}" "${server}${remotedir}/${filename}" -o "${filename}"
 			# mark complete
-			[[ $? -eq 0 ]] && touch ${localdir}/${filename}.complete && echo ""
+			[[ $? -eq 0 ]] && touch "${localdir}/${filename}.complete" && echo ""
 
 		fi
 	fi
 
 	if [[ -f ${localdir}/${filename}.asc ]]; then
 
-		if grep -q 'BEGIN PGP SIGNATURE' ${localdir}/${filename}.asc; then
+		if grep -q 'BEGIN PGP SIGNATURE' "${localdir}/${filename}.asc"; then
 
-			if [[ ! -d $SRC/cache/.gpg ]]; then
-				mkdir -p $SRC/cache/.gpg
-				chmod 700 $SRC/cache/.gpg
-				touch $SRC/cache/.gpg/gpg.conf
-				chmod 600 $SRC/cache/.gpg/gpg.conf
+			if [[ ! -d "${SRC}"/cache/.gpg ]]; then
+				mkdir -p "${SRC}"/cache/.gpg
+				chmod 700 "${SRC}"/cache/.gpg
+				touch "${SRC}"/cache/.gpg/gpg.conf
+				chmod 600 "${SRC}"/cache/.gpg/gpg.conf
 			fi
 
 			# Verify archives with Linaro and Armbian GPG keys
 
-			if [ x"" != x$http_proxy ]; then
-				(gpg --homedir $SRC/cache/.gpg --no-permission-warning --list-keys 8F427EAF >> $DEST/debug/output.log 2>&1\
-				 || gpg --homedir $SRC/cache/.gpg --no-permission-warning \
-				--keyserver hkp://keyserver.ubuntu.com:80 --keyserver-options http-proxy=$http_proxy \
-				--recv-keys 8F427EAF >> $DEST/debug/output.log 2>&1)
+			if [ x"" != x"${http_proxy}" ]; then
+				(gpg --homedir "${SRC}"/cache/.gpg --no-permission-warning --list-keys 8F427EAF >> "${DEST}"/debug/output.log 2>&1\
+				 || gpg --homedir "${SRC}"/cache/.gpg --no-permission-warning \
+				--keyserver hkp://keyserver.ubuntu.com:80 --keyserver-options http-proxy="${http_proxy}" \
+				--recv-keys 8F427EAF >> "${DEST}"/debug/output.log 2>&1)
 
-				(gpg --homedir $SRC/cache/.gpg --no-permission-warning --list-keys 9F0E78D5 >> $DEST/debug/output.log 2>&1\
-				|| gpg --homedir $SRC/cache/.gpg --no-permission-warning \
-				--keyserver hkp://keyserver.ubuntu.com:80 --keyserver-options http-proxy=$http_proxy \
-				--recv-keys 9F0E78D5 >> $DEST/debug/output.log 2>&1)
+				(gpg --homedir "${SRC}"/cache/.gpg --no-permission-warning --list-keys 9F0E78D5 >> "${DEST}"/debug/output.log 2>&1\
+				|| gpg --homedir "${SRC}"/cache/.gpg --no-permission-warning \
+				--keyserver hkp://keyserver.ubuntu.com:80 --keyserver-options http-proxy="${http_proxy}" \
+				--recv-keys 9F0E78D5 >> "${DEST}"/debug/output.log 2>&1)
 			else
-				(gpg --homedir $SRC/cache/.gpg --no-permission-warning --list-keys 8F427EAF >> $DEST/debug/output.log 2>&1\
-				 || gpg --homedir $SRC/cache/.gpg --no-permission-warning \
+				(gpg --homedir "${SRC}"/cache/.gpg --no-permission-warning --list-keys 8F427EAF >> "${DEST}"/debug/output.log 2>&1\
+				 || gpg --homedir "${SRC}"/cache/.gpg --no-permission-warning \
 				--keyserver hkp://keyserver.ubuntu.com:80 \
-				--recv-keys 8F427EAF >> $DEST/debug/output.log 2>&1)
+				--recv-keys 8F427EAF >> "${DEST}"/debug/output.log 2>&1)
 
-				(gpg --homedir $SRC/cache/.gpg --no-permission-warning --list-keys 9F0E78D5 >> $DEST/debug/output.log 2>&1\
-				|| gpg --homedir $SRC/cache/.gpg --no-permission-warning \
+				(gpg --homedir "${SRC}"/cache/.gpg --no-permission-warning --list-keys 9F0E78D5 >> "${DEST}"/debug/output.log 2>&1\
+				|| gpg --homedir "${SRC}"/cache/.gpg --no-permission-warning \
 				--keyserver hkp://keyserver.ubuntu.com:80 \
-				--recv-keys 9F0E78D5 >> $DEST/debug/output.log 2>&1)
+				--recv-keys 9F0E78D5 >> "${DEST}"/debug/output.log 2>&1)
 			fi
 
-			gpg --homedir $SRC/cache/.gpg --no-permission-warning --verify \
-			--trust-model always -q ${localdir}/${filename}.asc >> $DEST/debug/output.log 2>&1
+			gpg --homedir "${SRC}"/cache/.gpg --no-permission-warning --verify \
+			--trust-model always -q "${localdir}/${filename}.asc" >> "${DEST}"/debug/output.log 2>&1
 			[[ ${PIPESTATUS[0]} -eq 0 ]] && verified=true && display_alert "Verified" "PGP" "info"
 
 		else
 
-			md5sum -c --status ${localdir}/${filename}.asc && verified=true && display_alert "Verified" "MD5" "info"
+			md5sum -c --status "${localdir}/${filename}.asc" && verified=true && display_alert "Verified" "MD5" "info"
 
 		fi
 
@@ -1140,8 +1149,8 @@ download_and_verify()
 			if [[ "${filename:(-6)}" == "tar.xz" ]]; then
 
 				display_alert "decompressing"
-				pv -p -b -r -c -N "[ .... ] ${filename}" $filename | xz -dc | tar xp --xattrs --no-same-owner --overwrite
-				[[ $? -eq 0 ]] && touch ${localdir}/$dirname/.download-complete
+				pv -p -b -r -c -N "[ .... ] ${filename}" "${filename}" | xz -dc | tar xp --xattrs --no-same-owner --overwrite
+				[[ $? -eq 0 ]] && touch "${localdir}/${dirname}/.download-complete"
 			fi
 		else
 			exit_with_error "verification failed"
@@ -1149,7 +1158,6 @@ download_and_verify()
 
 	fi
 }
-
 
 
 
