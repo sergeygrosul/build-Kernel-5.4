@@ -51,6 +51,8 @@ index 0000000..39d6a27
 +	sun5i-a13-uart3.dtbo
 +
 +dtbo-$(CONFIG_MACH_SUN7I) += \
++	sun7i-a20-adatis-lcd.dtbo \
++	sun7i-a20-adatis-lvds.dtbo \
 +	sun7i-a20-analog-codec.dtbo \
 +	sun7i-a20-can.dtbo \
 +	sun7i-a20-i2c1.dtbo \
@@ -81,8 +83,6 @@ index 0000000..39d6a27
 +	sun8i-h3-i2c2.dtbo \
 +	sun8i-h3-pps-gpio.dtbo \
 +	sun8i-h3-pwm.dtbo \
-+	sun8i-h3-spdif-out.dtbo \
-+	sun8i-h3-spi-add-cs1.dtbo \
 +	sun8i-h3-spi-jedec-nor.dtbo \
 +	sun8i-h3-spi-spidev.dtbo \
 +	sun8i-h3-uart1.dtbo \
