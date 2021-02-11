@@ -1,3 +1,5 @@
-verbosity=8
+verbosity=0
 logo=okay
 console=serial
+overlay_prefix=sun7i-a20
+bootm_boot_mode=nonsec
