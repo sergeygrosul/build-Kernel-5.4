@@ -50,7 +50,11 @@ index 0000000..39d6a27
 +dtbo-$(CONFIG_MACH_SUN7I) += \
 +	sun7i-a20-adatis-lcd.dtbo \
 +	sun7i-a20-adatis-lvds.dtbo \
++	sun7i-a20-adatis-avs7611.dtbo \
++	sun7i-a20-adatis-ar0144.dtbo \
 +	sun7i-a20-adatis-sitronix.dtbo \
++	sun7i-a20-adatis-egalax.dtbo \
++	sun7i-a20-adatis-ili2511.dtbo \
 +	sun7i-a20-adatis-keys.dtbo \
 +	sun7i-a20-adatis-wiegand.dtbo \
 +	sun7i-a20-analog-codec.dtbo \
@@ -87,11 +91,7 @@ index 0000000..39d6a27
 +	sun8i-h3-spi-spidev.dtbo \
 +	sun8i-h3-uart1.dtbo \
 +	sun8i-h3-uart2.dtbo \
-+	sun8i-h3-uart3.dtbo \
 +	sun8i-h3-usbhost0.dtbo \
-+	sun8i-h3-usbhost1.dtbo \
-+	sun8i-h3-usbhost2.dtbo \
-+	sun8i-h3-usbhost3.dtbo \
 +	sun8i-h3-w1-gpio.dtbo
 +
 +scr-$(CONFIG_MACH_SUN4I) += sun4i-a10-fixup.scr
