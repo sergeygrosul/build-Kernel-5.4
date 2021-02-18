@@ -13,7 +13,7 @@ new file mode 100644
 index 0000000..39d6a27
 --- /dev/null
 +++ b/arch/arm/boot/dts/overlay/Makefile
-@@ -0,0 +1,89 @@
+@@ -0,0 +1,95 @@
 +# SPDX-License-Identifier: GPL-2.0
 +dtbo-$(CONFIG_MACH_SUN4I) += \
 +	sun4i-a10-analog-codec.dtbo \
@@ -52,9 +52,17 @@ index 0000000..39d6a27
 +	sun7i-a20-adatis-lvds.dtbo \
 +	sun7i-a20-adatis-avs7611.dtbo \
 +	sun7i-a20-adatis-ar0144.dtbo \
++	sun7i-a20-adatis-fm1288.dtbo \
++	sun7i-a20-adatis-lm75.dtbo \
++	sun7i-a20-adatis-mma7660.dtbo \
 +	sun7i-a20-adatis-sitronix.dtbo \
 +	sun7i-a20-adatis-egalax.dtbo \
 +	sun7i-a20-adatis-ili2511.dtbo \
++	sun7i-a20-adatis-lm36011.dtbo \
++	sun7i-a20-adatis-mp3309c.dtbo \
++	sun7i-a20-adatis-opt3001.dtbo \
++	sun7i-a20-adatis-ext-watchdog-pb4.dtbo \
++	sun7i-a20-adatis-agd715.dtbo \
 +	sun7i-a20-adatis-keys.dtbo \
 +	sun7i-a20-adatis-wiegand.dtbo \
 +	sun7i-a20-analog-codec.dtbo \
@@ -87,10 +95,8 @@ index 0000000..39d6a27
 +	sun8i-h3-i2c2.dtbo \
 +	sun8i-h3-pps-gpio.dtbo \
 +	sun8i-h3-pwm.dtbo \
-+	sun8i-h3-spi-jedec-nor.dtbo \
 +	sun8i-h3-spi-spidev.dtbo \
 +	sun8i-h3-uart1.dtbo \
-+	sun8i-h3-uart2.dtbo \
 +	sun8i-h3-usbhost0.dtbo \
 +	sun8i-h3-w1-gpio.dtbo
 +
