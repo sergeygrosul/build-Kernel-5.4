@@ -34,13 +34,14 @@ index c4c580f547ef..2be8a687f878 100755
 +	if [ "$3" = "dtb" ]; then
 +
 +	cat >> $pdir/DEBIAN/preinst <<EOT
-+rm -rf /boot/dtb-$version; rm -rf /boot/dtb
++rm -rf /boot/dtb-$version; rm -rf /boot/dtb; rm -rf /boot/overlay-user
 +exit 0
 +EOT
 +
 +	cat >> $pdir/DEBIAN/postinst <<EOT
 +cd /boot
 +ln -sfT dtb-$version dtb 2> /dev/null || mv dtb-$version dtb
++ln -sfT dtb/overlay-user overlay-user 2> /dev/null
 +exit 0
 +EOT
 +

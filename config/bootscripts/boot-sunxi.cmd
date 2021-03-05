@@ -74,12 +74,12 @@ if test -e ${devtype} ${devnum} "${prefix}.next"; then
 	i2c dev 4
 	i2c probe 50
 	if test $? = 1; then
-		if load ${devtype} ${devnum} ${load_addr} ${prefix}dtb/overlay/sun7i-a20-adatis-lcd.dtbo; then
+		if load ${devtype} ${devnum} ${load_addr} ${prefix}overlay-user/sun7i-a20-adatis-lcd.dtbo; then
 			echo "Adatis: Applying kernel provided DT overlay sun7i-a20-adatis-lcd.dtbo"
 			fdt apply ${load_addr} || setenv overlay_error "true"
 		fi
 	else
-		if load ${devtype} ${devnum} ${load_addr} ${prefix}dtb/overlay/sun7i-a20-adatis-lvds.dtbo; then
+		if load ${devtype} ${devnum} ${load_addr} ${prefix}overlay-user/sun7i-a20-adatis-lvds.dtbo; then
 			echo "Adatis: Applying kernel provided DT overlay sun7i-a20-adatis-lvds.dtbo"
 			fdt apply ${load_addr} || setenv overlay_error "true"
 		fi
