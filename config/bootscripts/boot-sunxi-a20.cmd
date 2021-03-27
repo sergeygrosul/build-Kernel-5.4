@@ -41,8 +41,21 @@ if test "${logo}" = "disabled"; then setenv logo "logo.nologo"; fi
 if test "${console}" = "display" || test "${console}" = "both"; then setenv consoleargs "console=ttyS0,115200 console=tty1"; fi
 if test "${console}" = "serial"; then setenv consoleargs "console=ttyS0,115200"; fi
 
+# ADATIS: check INP1(PH17=241) pin, if HIGH then enable alternative UART
+gpio input 241
+if test $? = 1 || test "${console}" = "serial2"; then 
+	echo "Selected alternative serial console UART7"
+	# Enable TX mode for RS485 receiver
+	gpio set 275 1
+	# Set ADG715 TTL mode
+	i2c dev 2
+	i2c mw 0x4b 0 5
+	# Set Kernel UART
+	setenv consoleargs "console=ttyS2,115200"
+fi
 
-setenv bootargs "root=${rootdev} rootwait rootfstype=${rootfstype} ${consoleargs} hdmi.audio=EDID:0 disp.screen0_output_mode=${disp_mode} consoleblank=0 loglevel=${verbosity} ubootpart=${partuuid} ubootsource=${devtype} usb-storage.quirks=${usbstoragequirks} ${extraargs} ${extraboardargs} net.ifnames=0 biosdevname=0"
+
+setenv bootargs "root=${rootdev} rootwait rootfstype=${rootfstype} ${consoleargs} hdmi.audio=EDID:0 disp.screen0_output_mode=${disp_mode} consoleblank=0 loglevel=${verbosity} ubootpart=${partuuid} ubootsource=${devtype} usb-storage.quirks=${usbstoragequirks} ${extraargs} ${extraboardargs}"
 
 if test "${disp_mem_reserves}" = "off"; then setenv bootargs "${bootargs} sunxi_ve_mem_reserve=0 sunxi_g2d_mem_reserve=0 sunxi_fb_mem_reserve=16"; fi
 if test "${docker_optimizations}" = "on"; then setenv bootargs "${bootargs} cgroup_enable=memory swapaccount=1"; fi
@@ -55,6 +68,23 @@ if test -e ${devtype} ${devnum} "${prefix}.next"; then
 	load ${devtype} ${devnum} ${fdt_addr_r} ${prefix}dtb/${fdtfile}
 	fdt addr ${fdt_addr_r}
 	fdt resize 65536
+
+	# ADATIS: Load Display overlays
+	echo "Load Adatis LCD display overlay:"
+	i2c dev 4
+	i2c probe 50
+	if test $? = 1; then
+		if load ${devtype} ${devnum} ${load_addr} ${prefix}overlay-user/sun7i-a20-adatis-lcd.dtbo; then
+			echo "Adatis: Applying kernel provided DT overlay sun7i-a20-adatis-lcd.dtbo"
+			fdt apply ${load_addr} || setenv overlay_error "true"
+		fi
+	else
+		if load ${devtype} ${devnum} ${load_addr} ${prefix}overlay-user/sun7i-a20-adatis-lvds.dtbo; then
+			echo "Adatis: Applying kernel provided DT overlay sun7i-a20-adatis-lvds.dtbo"
+			fdt apply ${load_addr} || setenv overlay_error "true"
+		fi
+	fi
+	# Done Adatis overlays
 
 	for overlay_file in ${overlays}; do
 		if load ${devtype} ${devnum} ${load_addr} ${prefix}dtb/overlay/${overlay_prefix}-${overlay_file}.dtbo; then

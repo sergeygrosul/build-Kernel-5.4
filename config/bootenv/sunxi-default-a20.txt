@@ -1,0 +1,6 @@
+verbosity=0
+logo=okay
+console=serial
+overlay_prefix=sun7i-a20
+user_overlays=sun7i-a20-adatis-keys sun7i-a20-adatis-wiegand sun7i-a20-adatis-sitronix sun7i-a20-adatis-avs7611 sun7i-a20-adatis-ar0144 sun7i-a20-adatis-opt3001 sun7i-a20-adatis-lm75 sun7i-a20-adatis-fm1288 sun7i-a20-adatis-mma7660 sun7i-a20-adatis-lm36011 sun7i-a20-adatis-mp3309c sun7i-a20-adatis-ext-watchdog-pb4 sun7i-a20-adatis-agd715
+bootm_boot_mode=nonsec
