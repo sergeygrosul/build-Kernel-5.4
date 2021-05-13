@@ -6945,28 +6945,6 @@ index 7ec895407d23..e0a5fe83d8e0 100644
  		} while (retry > 0);
  		if (!retry)
  			dev_err(&ethqos->pdev->dev,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 06dd65c419c4..582176d869c3 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -4763,6 +4763,7 @@ int stmmac_suspend(struct device *dev)
- {
- 	struct net_device *ndev = dev_get_drvdata(dev);
- 	struct stmmac_priv *priv = netdev_priv(ndev);
-+	u32 chan;
- 
- 	if (!ndev || !netif_running(ndev))
- 		return 0;
-@@ -4776,6 +4777,9 @@ int stmmac_suspend(struct device *dev)
- 
- 	stmmac_disable_all_queues(priv);
- 
-+	for (chan = 0; chan < priv->plat->tx_queues_to_use; chan++)
-+		del_timer_sync(&priv->tx_queue[chan].txtimer);
-+
- 	/* Stop TX/RX DMA */
- 	stmmac_stop_all_dma(priv);
- 
 diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
 index 9b3ba98726d7..3a53d222bfcc 100644
 --- a/drivers/net/gtp.c
