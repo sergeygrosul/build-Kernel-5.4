@@ -9,7 +9,6 @@ Signed-off-by: Jernej Skrabec <jernej.skrabec@siol.net>
 ---
  .../media/uapi/v4l/ext-ctrls-codec.rst        | 41 +++++++++++++++++++
  .../media/uapi/v4l/pixfmt-compressed.rst      |  1 +
- drivers/media/v4l2-core/v4l2-ctrls.c          | 10 +++++
  include/media/hevc-ctrls.h                    | 11 +++++
  4 files changed, 63 insertions(+)
 
@@ -66,48 +65,6 @@ index a1209f68c5e8..382e85e16444 100644
      Specifies the decoding mode to use. Currently exposes slice-based and
      frame-based decoding but new modes might be added later on.
 
-diff --git a/drivers/media/v4l2-core/v4l2-ctrls.c b/drivers/media/v4l2-core/v4l2-ctrls.c
-index b4caf2d4d076..2803165cbc6a 100644
---- a/drivers/media/v4l2-core/v4l2-ctrls.c
-+++ b/drivers/media/v4l2-core/v4l2-ctrls.c
-@@ -975,6 +975,7 @@ const char *v4l2_ctrl_get_name(u32 id)
- 	case V4L2_CID_MPEG_VIDEO_HEVC_SPS:			return "HEVC Sequence Parameter Set";
- 	case V4L2_CID_MPEG_VIDEO_HEVC_PPS:			return "HEVC Picture Parameter Set";
- 	case V4L2_CID_MPEG_VIDEO_HEVC_SLICE_PARAMS:		return "HEVC Slice Parameters";
-+	case V4L2_CID_MPEG_VIDEO_HEVC_SCALING_MATRIX:		return "HEVC Scaling Matrix";
- 	case V4L2_CID_MPEG_VIDEO_HEVC_DECODE_MODE:		return "HEVC Decode Mode";
- 	case V4L2_CID_MPEG_VIDEO_HEVC_START_CODE:		return "HEVC Start Code";
- 
-@@ -1407,6 +1408,9 @@ void v4l2_ctrl_fill(u32 id, const char **name, enum v4l2_ctrl_type *type,
- 	case V4L2_CID_MPEG_VIDEO_HEVC_SLICE_PARAMS:
- 		*type = V4L2_CTRL_TYPE_HEVC_SLICE_PARAMS;
- 		break;
-+	case V4L2_CID_MPEG_VIDEO_HEVC_SCALING_MATRIX:
-+		*type = V4L2_CTRL_TYPE_HEVC_SCALING_MATRIX;
-+		break;
- 	case V4L2_CID_UNIT_CELL_SIZE:
- 		*type = V4L2_CTRL_TYPE_AREA;
- 		*flags |= V4L2_CTRL_FLAG_READ_ONLY;
-@@ -1856,6 +1860,9 @@ static int std_validate_compound(const struct v4l2_ctrl *ctrl, u32 idx,
- 		zero_padding(*p_hevc_slice_params);
- 		break;
- 
-+	case V4L2_CTRL_TYPE_HEVC_SCALING_MATRIX:
-+		break;
-+
- 	case V4L2_CTRL_TYPE_AREA:
- 		area = p;
- 		if (!area->width || !area->height)
-@@ -2545,6 +2552,9 @@ static struct v4l2_ctrl *v4l2_ctrl_new(struct v4l2_ctrl_handler *hdl,
- 	case V4L2_CTRL_TYPE_HEVC_SLICE_PARAMS:
- 		elem_size = sizeof(struct v4l2_ctrl_hevc_slice_params);
- 		break;
-+	case V4L2_CTRL_TYPE_HEVC_SCALING_MATRIX:
-+		elem_size = sizeof(struct v4l2_ctrl_hevc_scaling_matrix);
-+		break;
- 	case V4L2_CTRL_TYPE_AREA:
- 		elem_size = sizeof(struct v4l2_area);
- 		break;
 diff --git a/include/media/hevc-ctrls.h b/include/media/hevc-ctrls.h
 index 1009cf0891cc..1592e52c3614 100644
 --- a/include/media/hevc-ctrls.h

@@ -702,18 +702,6 @@ index bbb0c5e3ca6f..9f770d454684 100644
  		kvfree(job->mappings);
  	}
  
-diff --git a/drivers/gpu/drm/sun4i/sun4i_drv.c b/drivers/gpu/drm/sun4i/sun4i_drv.c
-index a5757b11b730..5b54eff12cc0 100644
---- a/drivers/gpu/drm/sun4i/sun4i_drv.c
-+++ b/drivers/gpu/drm/sun4i/sun4i_drv.c
-@@ -85,7 +85,6 @@ static int sun4i_drv_bind(struct device *dev)
- 	}
- 
- 	drm_mode_config_init(drm);
--	drm->mode_config.allow_fb_modifiers = true;
- 
- 	ret = component_bind_all(drm->dev, drm);
- 	if (ret) {
 diff --git a/drivers/gpu/drm/vgem/vgem_drv.c b/drivers/gpu/drm/vgem/vgem_drv.c
 index 5bd60ded3d81..909eba43664a 100644
 --- a/drivers/gpu/drm/vgem/vgem_drv.c

@@ -42,3 +42,10 @@ FR_net_static_mask='255.255.255.0'
 FR_net_static_gateway='192.168.0.1'
 FR_net_static_dns='8.8.8.8 8.8.4.4' #2 entries max, seperated by a space.
 #-----------------------------------------------------------------
+
+#create Swap file
+echo "/swapfile     swap     swap     defaults     0     0" >> /etc/fstab
+fallocate --length 1GiB /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
