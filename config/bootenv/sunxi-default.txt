@@ -1,4 +1,0 @@
-verbosity=7
-logo=okay
-console=serial
-bootm_boot_mode=nonsec
