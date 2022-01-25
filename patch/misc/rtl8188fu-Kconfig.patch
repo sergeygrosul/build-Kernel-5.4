@@ -1,0 +1,17 @@
+diff --git a/Kconfig b/Kconfig
+index 87af8dd..80f99ec 100644
+--- a/Kconfig
++++ b/Kconfig
+@@ -1,7 +1,5 @@
+-# SPDX-License-Identifier: GPL-2.0
+ config RTL8188FU
+-	tristate "Realtek 8188F USB WiFi"
+-	depends on USB
+-	---help---
+-	  Help message of RTL8818FU
+-
++        tristate "Realtek 8188FU WiFi"
++        depends on USB
++        help
++          Help message of RTL8188FU
+\ No newline at end of file

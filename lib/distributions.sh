@@ -495,7 +495,8 @@ FAMILY_TWEAKS
 	done
 	IFS=$ifs
 
-	[[ $LINUXFAMILY == sun*i ]] && mkdir -p "${SDCARD}"/boot/overlay-user
+#	[[ $LINUXFAMILY == sun*i ]] && mkdir -p "${SDCARD}"/boot/overlay-user
+	[[ $LINUXFAMILY == sun*i ]] && ln -s dtb/overlay-user "${SDCARD}"/boot/overlay-user
 
 	# to prevent creating swap file on NFS (needs specific kernel options)
 	# and f2fs/btrfs (not recommended or needs specific kernel options)
