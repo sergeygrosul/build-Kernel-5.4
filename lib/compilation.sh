@@ -409,7 +409,7 @@ compile_kernel()
 	local version
 	version=$(grab_version "$kerneldir")
 
-	display_alert "Compiling $BRANCH kernel" "$version" "info"
+	display_alert "!!!Compiling $BRANCH kernel" "$version" "info"
 
 	# compare with the architecture of the current Debian node
 	# if it matches we use the system compiler

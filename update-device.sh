@@ -1,11 +1,11 @@
-A20_IP="192.168.1.124"
+A20_IP="192.168.1.125"
 
 echo "Copy DTB file..."
 sshpass -p 'adatis' scp ./output/debs/linux-dtb-current-sunxi_22.02.0-trunk_armhf.deb root@$A20_IP:/root/deb
 echo "Copy the Kernel..."
 sshpass -p 'adatis' scp ./output/debs/linux-image-current-sunxi_22.02.0-trunk_armhf.deb root@$A20_IP:/root/deb
 echo "Copy the u-boot..."
-sshpass -p 'adatis' scp ./output/debs/linux-u-boot-current-adatis-v17_22.02.0-trunk_armhf.deb root@$A20_IP:/root/deb
+sshpass -p 'adatis' scp ./output/debs/linux-u-boot-current-adatis-v18_22.02.0-trunk_armhf.deb root@$A20_IP:/root/deb
 #sshpass -p 'adatis' ssh root@$A20_IP 'dpkg -i *.deb && sync'
 echo "Installing ..."
 sshpass -p 'adatis' ssh root@$A20_IP 'cd /root/deb && dpkg -i *.deb && sync && reboot'

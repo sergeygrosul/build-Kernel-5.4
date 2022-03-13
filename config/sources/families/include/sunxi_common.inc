@@ -23,6 +23,7 @@ case "$KERNEL_VERSION_LEVEL" in
 	5.10|5.15)
 		KERNELSOURCE=$MAINLINE_KERNEL_SOURCE
 		KERNELSOURCENAME='name=origin'
+#		KERNELBRANCH="tag:v5.10.98"
 		KERNELBRANCH="branch:linux-${KERNEL_VERSION_LEVEL}.y"
 	;;
 
@@ -37,7 +38,7 @@ KERNELPATCHDIR='sunxi-'$BRANCH
 
 # An optional parameter for switching to a git object such as a tag, commit,
 # or a specific branch. The object must exist in the local repository.
-# KERNELSWITCHOBJ="tag=v5.10.15"
+KERNELSWITCHOBJ="tag=v5.10.98"
 # tag|obj|commit=v5.10.15|megous/$branch|$hash
 
 family_tweaks()
@@ -90,7 +91,9 @@ var_origin_kernel ()
 	url=$MAINLINE_KERNEL_SOURCE
 	name='origin'
 	branch="linux-${KERNEL_VERSION_LEVEL}.y"
-	start_tag="v$KERNEL_VERSION_LEVEL"
+#	branch="v5.10.98"
+#	start_tag="v$KERNEL_VERSION_LEVEL"
+	start_tag="v5.10.98"
 
 	# checking the reachability of the initial tag
 	if [ "$(git ls-remote --tags $url $start_tag | \
