@@ -1,4 +1,4 @@
-A20_IP="192.168.1.106"
+A20_IP="192.168.2.238"
 
 sshpass -p 'adatis' scp ./output/debs/linux-dtb-current-sunxi_22.02.0-trunk_armhf.deb root@$A20_IP:/root
 sshpass -p 'adatis' scp ./output/debs/linux-image-current-sunxi_22.02.0-trunk_armhf.deb root@$A20_IP:/root

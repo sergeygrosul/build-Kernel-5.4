@@ -2719,21 +2719,6 @@ index 0826cfdbd406..9ba31701a372 100644
  
  	if (of_property_read_bool(np, "no-loopback-test"))
  		port->flags |= UPF_SKIP_TEST;
-diff --git a/drivers/tty/serial/8250/8250_port.c b/drivers/tty/serial/8250/8250_port.c
-index 8407166610ce..2c65c775bf5a 100644
---- a/drivers/tty/serial/8250/8250_port.c
-+++ b/drivers/tty/serial/8250/8250_port.c
-@@ -2192,6 +2192,10 @@ int serial8250_do_startup(struct uart_port *port)
- 		}
- 	}
- 
-+	/* Check if we need to have shared IRQs */
-+	if (port->irq && (up->port.flags & UPF_SHARE_IRQ))
-+		up->port.irqflags |= IRQF_SHARED;
-+
- 	if (port->irq && !(up->port.flags & UPF_NO_THRE_TEST)) {
- 		unsigned char iir1;
- 		/*
 diff --git a/drivers/tty/serial/atmel_serial.c b/drivers/tty/serial/atmel_serial.c
 index 1ba9bc667e13..8a909d556185 100644
 --- a/drivers/tty/serial/atmel_serial.c

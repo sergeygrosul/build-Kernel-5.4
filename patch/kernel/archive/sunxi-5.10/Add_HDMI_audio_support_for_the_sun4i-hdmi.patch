@@ -18,7 +18,6 @@ Changes for v2:
  - Wrap all macro arguments in parentheses
 
  drivers/gpu/drm/sun4i/Kconfig            |  11 +
- drivers/gpu/drm/sun4i/Makefile           |   3 +
  drivers/gpu/drm/sun4i/sun4i_hdmi.h       |  37 ++
  drivers/gpu/drm/sun4i/sun4i_hdmi_audio.c | 450 +++++++++++++++++++++++
  drivers/gpu/drm/sun4i/sun4i_hdmi_enc.c   |  14 +
@@ -47,20 +46,6 @@ index 37e90e42943f..ca2ab5d53dd4 100644
  config DRM_SUN4I_HDMI_CEC
         bool "Allwinner A10 HDMI CEC Support"
         depends on DRM_SUN4I_HDMI
-diff --git a/drivers/gpu/drm/sun4i/Makefile b/drivers/gpu/drm/sun4i/Makefile
-index 0d04f2447b01..492bfd28ad2e 100644
---- a/drivers/gpu/drm/sun4i/Makefile
-+++ b/drivers/gpu/drm/sun4i/Makefile
-@@ -5,6 +5,9 @@ sun4i-frontend-y		+= sun4i_frontend.o
- sun4i-drm-y			+= sun4i_drv.o
- sun4i-drm-y			+= sun4i_framebuffer.o
-
-+ifdef CONFIG_DRM_SUN4I_HDMI_AUDIO
-+sun4i-drm-hdmi-y		+= sun4i_hdmi_audio.o
-+endif
- sun4i-drm-hdmi-y		+= sun4i_hdmi_ddc_clk.o
- sun4i-drm-hdmi-y		+= sun4i_hdmi_enc.o
- sun4i-drm-hdmi-y		+= sun4i_hdmi_i2c.o
 diff --git a/drivers/gpu/drm/sun4i/sun4i_hdmi.h b/drivers/gpu/drm/sun4i/sun4i_hdmi.h
 index 7ad3f06c127e..28621d289655 100644
 --- a/drivers/gpu/drm/sun4i/sun4i_hdmi.h
